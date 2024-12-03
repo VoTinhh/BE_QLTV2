@@ -7,20 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 class HoaDon extends Model
 {
     protected $table = 'hoa_dons';
-    
+
     protected $fillable = [
-        'tong_tien',        // Tổng tiền của hóa đơn
-        'trang_thai',       // Trạng thái của hóa đơn
-        'id_phieu_muon',    // ID phiếu mượn liên kết
+        'trang_thai',
+        'id_thanh_toan',
+        'id_sach',
+        'id_nguoi_dung',
+        'id_phieu_muon',
     ];
 
-    public function thanhToans()
+    public function thanhToan()
     {
-        return $this->hasMany(ThanhToan::class, 'id_hoa_don'); // Mối quan hệ 1-N với bảng thanh toán
+        return $this->belongsTo(ThanhToan::class, 'id_thanh_toan');
     }
-
     public function phieuMuon()
-    {
-        return $this->belongsTo(PhieuMuon::class, 'id_phieu_muon'); // Mối quan hệ N-1 với bảng phiếu mượn
-    }
+{
+    return $this->belongsTo(PhieuMuon::class, 'id_phieu_muon');
+}
+
 }

@@ -10,4 +10,9 @@ class LichSuMuon extends Model
     protected $fillable = [
         'id_phieu_muon',
     ];
+
+    public function phieuMuon()
+    {
+        return $this->belongsTo(PhieuMuon::class, 'id_phieu_muon');
+    }
 }

@@ -16,9 +16,11 @@ return new class extends Migration
             $table->date('ngay_muon');
             $table->date('ngay_tra');
             $table->date('ngay_tra_thuc_te')->nullable();
-            $table->decimal('tien_phat', 10, 2)->nullable();
+            $table->decimal('tien_phat', 10, 2)->default(0);
+            $table->integer('so_luong_sach');
             $table->integer('id_sach');
-            $table->integer('id_user');
+            $table->integer('id_thanh_toan')->nullable();
+            $table->integer('id_nguoi_dung');
             $table->timestamps();
         });
     }

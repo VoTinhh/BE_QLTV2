@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('thanh_toans', function (Blueprint $table) {
             $table->id();
-            $table->decimal('so_tien', 10, 2);
-            $table->string('phuong_thuc_thanh_toan');
-            $table->integer('id_hoa_don');
+            $table->decimal('tien_phat', 10, 2)->default(0);
+            $table->decimal('tien_thue', 10, 2)->default(0);
+            $table->decimal('tong_tien', 10, 2);
+            $table->integer('trang_thai')->default(0);
+            $table->integer('id_phieu_muon');
             $table->timestamps();
         });
         

@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('hoa_dons', function (Blueprint $table) {
             $table->id();
-            $table->decimal('tong_tien', 10, 2);
-            $table->string('trang_thai');
+            $table->integer('trang_thai')->default(0);
+            $table->integer('id_thanh_toan');
+            $table->integer('id_sach');
+            $table->integer('id_nguoi_dung');
             $table->integer('id_phieu_muon');
             $table->timestamps();
         });

@@ -28,4 +28,9 @@ class Sach extends Model
         'gia_tien',
         'mo_ta',
     ];
+
+    public function phieuMuon()
+    {
+        return $this->hasMany(PhieuMuon::class, 'id_sach');
+    }
 }

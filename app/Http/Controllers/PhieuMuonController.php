@@ -10,38 +10,46 @@ use Illuminate\Support\Facades\Log;
 
 class PhieuMuonController extends Controller
 {
-    // // Lấy danh sách phiếu mượn và thông tin sách
-    // public function getData()
-    // {
-    //     $listPhieuMuon = phieu_muon::get();
-    //     $listSach = DB::table('sachs')->get();
-
-    //     return response()->json([
-    //         'listPhieuMuon' => $listPhieuMuon,
-    //         'listSach' => $listSach,
-    //     ]);
-    // }
-
-    // // Hiển thị trang quản lý phiếu mượn
-    // public function index()
-    // {
-    //     return view('phieu_muon');
-    // }
-
-    public function check(Request $request){
-        return response()->json([
-            'user' => $request->user(),
-        ]);
-    }
-
-    // Lấy danh sách tất cả phiếu mượn
-    public function getData()
+    public function getData(Request $request)
     {
-        $data = PhieuMuon::get();
+        try {
+            // Lấy id_nguoi_dung từ request (nếu có)
+            $idNguoiDung = $request->input('id_nguoi_dung');
 
-        return response()->json([
-            'phieu_muon' => $data,
-        ]);
+            DB::enableQueryLog();
+
+            // Thêm điều kiện lọc nếu id_nguoi_dung được cung cấp
+            $query = PhieuMuon::join('saches', 'saches.id_sach', '=', 'phieu_muons.id_sach')
+                ->join('nguoi_dungs', 'nguoi_dungs.id_nguoi_dung', '=', 'phieu_muons.id_nguoi_dung')
+                ->select('phieu_muons.*', 'saches.ten_sach', 'nguoi_dungs.ten_nguoi_dung');
+
+            if ($idNguoiDung) {
+                $query->where('phieu_muons.id_nguoi_dung', $idNguoiDung);
+            }
+
+            $data = $query->get();
+
+            Log::info(DB::getQueryLog());
+
+            if ($data->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không có phiếu mượn nào',
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'phieu_muon' => $data,
+            ]);
+        } catch (Exception $e) {
+            Log::error("Error while fetching PhieuMuon data", ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Không thể lấy danh sách phiếu mượn',
+            ]);
+        }
     }
 
     // Tìm kiếm phiếu mượn theo tên sách
@@ -66,28 +74,81 @@ class PhieuMuonController extends Controller
         ]);
     }
 
+        try {
+            if ($request->has('ten_sach')) {
+                $key = "%" . $request->ten_sach . "%";
+
+                $data = PhieuMuon::whereHas('sach', function ($query) use ($key) {
+                    $query->where('ten_sach', 'like', $key);
+                })->get();
+
+                return response()->json([
+                    'status' => true,
+                    'phieu_muon' => $data,
+                ]);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Vui lòng cung cấp tên sách để tìm kiếm',
+            ]);
+        } catch (Exception $e) {
+            Log::error("Lỗi khi tìm kiếm phiếu mượn", ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra khi tìm kiếm phiếu mượn',
+            ]);
+        }
+    }
 
     // Tạo mới phiếu mượn
     public function create(Request $request)
     {
-        PhieuMuon::create([
-            'ngay_muon' => $request->ngay_muon,
-            'ngay_tra' => $request->ngay_tra,
-            'id_sach' => $request->id_sach,
-            'id_user' => $request->id_user,
-        ]);
+        try {
+            Log::info("Dữ liệu đầu vào khi tạo phiếu mượn:", $request->all());
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Đã tạo mới phiếu mượn thành công!',
-        ]);
+            // Xác thực dữ liệu đầu vào
+            $request->validate([
+                'ngay_muon' => 'required|date',
+                'ngay_tra' => 'required|date',
+                'id_sach' => 'required|exists:saches,id_sach',
+                'id_nguoi_dung' => 'required|exists:nguoi_dungs,id_nguoi_dung',
+            ]);
+
+            // Tạo phiếu mượn mới
+            $phieuMuon = PhieuMuon::create([
+                'ngay_muon' => $request->ngay_muon,
+                'ngay_tra' => $request->ngay_tra,
+                'id_sach' => $request->id_sach,
+                'id_nguoi_dung' => $request->id_nguoi_dung,
+                'so_luong_sach' => 1 //ở giao diện truyền thêm trường so_luong_sach ve Be nữa à oke
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đã tạo mới phiếu mượn thành công!',
+                'phieu_muon' => $phieuMuon,
+            ]);
+        } catch (Exception $e) {
+            Log::error("Lỗi khi tạo mới phiếu mượn", [
+                'error' => $e->getMessage(),
+                'request' => $request->all()
+            ]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra khi tạo mới phiếu mượn',
+            ]);
+        }
     }
+
+
 
     // Xóa phiếu mượn theo ID
     public function delete($id)
     {
         try {
-            PhieuMuon::where('id', $id)->delete();
+            PhieuMuon::findOrFail($id)->delete();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Xóa phiếu mượn thành công!',
@@ -102,27 +163,19 @@ class PhieuMuonController extends Controller
     }
 
     // Cập nhật phiếu mượn
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        try {
-            PhieuMuon::where('id', $request->id)
-                ->update([
-                    'ngay_muon' => $request->ngay_muon,
-                    'ngay_tra' => $request->ngay_tra,
-                    'ngay_tra_thuc_te' => $request->ngay_tra_thuc_te,
-                    'tien_phat' => $request->tien_phat,
-                ]);
+        $PhieuMuon = PhieuMuon::findOrFail($id)->update([
+            'ngay_muon' => $request->ngay_muon,
+            'ngay_tra' => $request->ngay_tra,
+            'id_sach' => $request->id_sach,
+            'id_nguoi_dung' => $request->id_nguoi_dung,
+        ]);
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Đã cập nhật thành công phiếu mượn ' . $request->id,
-            ]);
-        } catch (Exception $e) {
-            Log::error("Lỗi khi cập nhật phiếu mượn", ['error' => $e->getMessage()]);
-            return response()->json([
-                'status' => false,
-                'message' => 'Có lỗi xảy ra khi cập nhật phiếu mượn',
-            ]);
-        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Cập nhật hóa đơn thành công!',
+            'hoa_don' => $PhieuMuon,
+        ]);
     }
 }

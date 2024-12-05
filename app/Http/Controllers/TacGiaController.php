@@ -24,7 +24,7 @@ class TacGiaController extends Controller
     }
     public function getData()
     {
-        $data = TacGia::get(); // Lấy tất cả hóa đơn
+        $data = TacGia::get();
 
         return response()->json([
             'data' => $data

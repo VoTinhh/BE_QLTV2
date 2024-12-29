@@ -30,6 +30,22 @@ class TacGiaController extends Controller
             'data' => $data
         ]);
     }
+    public function layThongTinTacGia($id)
+{
+    $data = TacGia::where('id', $id)->first();
+
+    if ($data) {
+        return response()->json([
+            'status' => true,
+            'data' => $data,
+        ]);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => "Tác giả không tồn tại trong hệ thống"
+        ]);
+    }
+}
     public function store(Request $request)
     {
         TacGia::create([

@@ -83,17 +83,25 @@ Route::group(['prefix' => 'vi-tri'], function () {
 });
 
 Route::group(['prefix' => 'phan-loai'], function () {
-    Route::get('/', [PhanLoaiController::class, 'getData']);
-    Route::post('/', [PhanLoaiController::class, 'store']);
+    Route::get('/data', [PhanLoaiController::class, 'getData']);
+    Route::post('/create', [PhanLoaiController::class, 'store']);
     Route::put('/{id}', [PhanLoaiController::class, 'update']);
-    Route::delete('/{id}', [PhanLoaiController::class, 'destroy']);
+    Route::delete('/delete/{id}', [PhanLoaiController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'nha-xuat-ban'], function () {
-    Route::get('/', [NhaXuatBanController::class, 'getData']);
-    Route::post('/', [NhaXuatBanController::class, 'store']);
+    Route::get('/data', [NhaXuatBanController::class, 'getData']);
+    Route::post('/create', [NhaXuatBanController::class, 'store']);
     Route::put('/{id}', [NhaXuatBanController::class, 'update']);
-    Route::delete('/{id}', [NhaXuatBanController::class, 'destroy']);
+    Route::delete('/delete/{id}', [NhaXuatBanController::class, 'destroy']);
+});
+
+Route::group(['prefix' => 'tac-gia'], function () {
+    Route::get('/data', [TacGiaController::class, 'getData']);
+    Route::get('/{id}', [TacGiaController::class, 'layThongTinTacGia']);
+    Route::post('/create', [TacGiaController::class, 'store']);
+    Route::put('/{id}', [TacGiaController::class, 'update']);
+    Route::delete('/delete/{id}', [TacGiaController::class, 'destroy']);
 });
 
 Route::prefix('nhan-vien')->group(function () {

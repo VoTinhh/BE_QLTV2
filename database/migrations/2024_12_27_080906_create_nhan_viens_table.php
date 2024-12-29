@@ -11,20 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nguoi_dungs', function (Blueprint $table) {
-            $table->id();
-            $table->string('ten_nguoi_dung');
+        Schema::create('nhan_viens', function (Blueprint $table) {
+            $table->id('id_nhan_vien');
+            $table->string('ten_nhan_vien');
             $table->string('hinh_anh')->nullable();
             $table->string('email')->unique();
             $table->string('so_dien_thoai')->nullable();
             $table->string('dia_chi')->nullable();
-            $table->string('password');
+            $table->string('mat_khau');
+            $table->integer('is_master')->default(0);
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('nguoi_dungs');
+        Schema::dropIfExists('nhan_viens');
     }
 };

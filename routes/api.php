@@ -6,6 +6,7 @@ use App\Http\Controllers\HoaDonController;
 use App\Http\Controllers\LichSuMuonController;
 use App\Http\Controllers\ThanhToanController;
 use App\Http\Controllers\NguoiDungController;
+use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaXuatBanController;
 use App\Http\Controllers\PhanLoaiController;
 use App\Http\Controllers\SachController;
@@ -15,9 +16,21 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\RouteGroup;
 use Illuminate\Support\Facades\Route;
 
+Route::group(['prefix' => 'nguoi-dung'], function () {
+    Route::post('/dang-nhap', [NguoiDungController::class, 'login'])->name('login');
+    Route::post('/dang-ky', [NguoiDungController::class, 'store']);
+});
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    Route::group(['prefix' => 'nguoi-dung'], function () {
+        Route::get('/aaa', [NguoiDungController::class, 'oke']);
+        Route::get('/', [NguoiDungController::class, 'getData']);
+        Route::get('/dang-xuat', [NguoiDungController::class, 'dangXuat']);
+        Route::put('/', [NguoiDungController::class, 'update']);
+        Route::delete('/{id}', [NguoiDungController::class, 'delete']);
+        Route::post('/tim-kiem', [NguoiDungController::class, 'search']);
+        Route::post('/check-login', [NguoiDungController::class, 'search']);
+    });
 });
 
 Route::group(['prefix' => 'phieu-muon'], function () {
@@ -51,12 +64,8 @@ Route::group(['prefix' => 'thanh-toan'], function () {
     Route::delete('/{id}', [ThanhToanController::class, 'delete']);
 });
 
-Route::group(['prefix' => 'nguoi-dung'], function () {
-    Route::get('/', [NguoiDungController::class, 'getData']);
-    Route::post('/', [NguoiDungController::class, 'store']);
-    Route::put('/{id}', [NguoiDungController::class, 'update']);
-    Route::delete('/{id}', [NguoiDungController::class, 'delete']);
-});
+
+
 
 Route::group(['prefix' => 'sach'], function () {
     Route::get('/', [SachController::class, 'getData']);
@@ -87,9 +96,13 @@ Route::group(['prefix' => 'nha-xuat-ban'], function () {
     Route::delete('/{id}', [NhaXuatBanController::class, 'destroy']);
 });
 
-Route::group(['prefix' => 'tac-gia'], function () {
-    Route::get('/', [TacGiaController::class, 'getData']);
-    Route::post('/', [TacGiaController::class, 'store']);
-    Route::put('/{id}', [TacGiaController::class, 'update']);
-    Route::delete('/{id}', [TacGiaController::class, 'destroy']);
+Route::prefix('nhan-vien')->group(function () {
+    Route::get('/', [NhanVienController::class, 'getData']);
+    Route::post('/create', [NhanVienController::class, 'store']);
+    Route::put('/{id}', [NhanVienController::class, 'update']);
+    Route::delete('/{id}', [NhanVienController::class, 'delete']);
+    Route::post('/dang-nhap', [NhanVienController::class, 'login']);
+    Route::post('/tim-kiem', [NhanVienController::class, 'search']);
+    Route::post('/check-login', [NhanVienController::class, 'checkLogin']);
 });
+

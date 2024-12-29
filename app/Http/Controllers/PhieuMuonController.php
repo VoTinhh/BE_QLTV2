@@ -28,6 +28,12 @@ class PhieuMuonController extends Controller
     //     return view('phieu_muon');
     // }
 
+    public function check(Request $request){
+        return response()->json([
+            'user' => $request->user(),
+        ]);
+    }
+
     // Lấy danh sách tất cả phiếu mượn
     public function getData()
     {
@@ -42,24 +48,24 @@ class PhieuMuonController extends Controller
     public function search(Request $request)
     {
         if ($request->has('ten_sach')) {
-            $key = "%" . $request->ten_sach . "%";  
-            
+            $key = "%" . $request->ten_sach . "%";
+
             $data = PhieuMuon::whereHas('sach', function ($query) use ($key) {
-                $query->where('ten_sach', 'like', $key);  
+                $query->where('ten_sach', 'like', $key);
             })->get();
-            
+
             return response()->json([
                 'status' => true,
                 'phieu_muon' => $data,
             ]);
         }
-    
+
         return response()->json([
             'status' => false,
             'message' => 'Vui lòng cung cấp tên sách để tìm kiếm',
         ]);
     }
-    
+
 
     // Tạo mới phiếu mượn
     public function create(Request $request)

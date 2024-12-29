@@ -13,13 +13,10 @@ class LichSuMuonController extends Controller
     public function getData(Request $request)
     {
         try {
-            // Lấy id_nguoi_dung từ request
-            $idNguoiDung = $request->input('id_nguoi_dung');
-
             // Lấy lịch sử mượn theo id_nguoi_dung và join với bảng phieu_muons, saches, nguoi_dungs
             $lichSuMuons = LichSuMuon::join('phieu_muons', 'phieu_muons.id', '=', 'lich_su_muons.id_phieu_muon')
                 ->join('saches', 'saches.id_sach', '=', 'phieu_muons.id_sach')
-                ->join('nguoi_dungs', 'nguoi_dungs.id_nguoi_dung', '=', 'phieu_muons.id_nguoi_dung')
+                ->join('nguoi_dungs', 'nguoi_dungs.id', '=', 'phieu_muons.id_nguoi_dung')
                 ->select(
                     'lich_su_muons.*',
                     'saches.ten_sach',
@@ -28,7 +25,7 @@ class LichSuMuonController extends Controller
                     'phieu_muons.ngay_tra_thuc_te',
                     'nguoi_dungs.ten_nguoi_dung'
                 )
-                ->where('phieu_muons.id_nguoi_dung', $idNguoiDung)
+                ->where('phieu_muons.id_nguoi_dung', $request->user()->id)
                 ->get();
 
             return response()->json([

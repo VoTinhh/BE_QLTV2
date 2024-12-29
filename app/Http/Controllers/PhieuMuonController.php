@@ -14,18 +14,13 @@ class PhieuMuonController extends Controller
     {
         try {
             // Lấy id_nguoi_dung từ request (nếu có)
-            $idNguoiDung = $request->input('id_nguoi_dung');
-
             DB::enableQueryLog();
 
             // Thêm điều kiện lọc nếu id_nguoi_dung được cung cấp
             $query = PhieuMuon::join('saches', 'saches.id_sach', '=', 'phieu_muons.id_sach')
-                ->join('nguoi_dungs', 'nguoi_dungs.id_nguoi_dung', '=', 'phieu_muons.id_nguoi_dung')
-                ->select('phieu_muons.*', 'saches.ten_sach', 'nguoi_dungs.ten_nguoi_dung');
-
-            if ($idNguoiDung) {
-                $query->where('phieu_muons.id_nguoi_dung', $idNguoiDung);
-            }
+                ->join('nguoi_dungs', 'nguoi_dungs.id', '=', 'phieu_muons.id_nguoi_dung')
+                ->select('phieu_muons.*', 'saches.ten_sach', 'nguoi_dungs.ten_nguoi_dung')
+                ->where('phieu_muons.id_nguoi_dung', $request->user()->id);
 
             $data = $query->get();
 
@@ -55,25 +50,6 @@ class PhieuMuonController extends Controller
     // Tìm kiếm phiếu mượn theo tên sách
     public function search(Request $request)
     {
-        if ($request->has('ten_sach')) {
-            $key = "%" . $request->ten_sach . "%";
-
-            $data = PhieuMuon::whereHas('sach', function ($query) use ($key) {
-                $query->where('ten_sach', 'like', $key);
-            })->get();
-
-            return response()->json([
-                'status' => true,
-                'phieu_muon' => $data,
-            ]);
-        }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Vui lòng cung cấp tên sách để tìm kiếm',
-        ]);
-    }
-
         try {
             if ($request->has('ten_sach')) {
                 $key = "%" . $request->ten_sach . "%";
@@ -101,26 +77,20 @@ class PhieuMuonController extends Controller
         }
     }
 
+
+
+
     // Tạo mới phiếu mượn
     public function create(Request $request)
     {
         try {
             Log::info("Dữ liệu đầu vào khi tạo phiếu mượn:", $request->all());
 
-            // Xác thực dữ liệu đầu vào
-            $request->validate([
-                'ngay_muon' => 'required|date',
-                'ngay_tra' => 'required|date',
-                'id_sach' => 'required|exists:saches,id_sach',
-                'id_nguoi_dung' => 'required|exists:nguoi_dungs,id_nguoi_dung',
-            ]);
-
-            // Tạo phiếu mượn mới
             $phieuMuon = PhieuMuon::create([
-                'ngay_muon' => $request->ngay_muon,
-                'ngay_tra' => $request->ngay_tra,
+                'ngay_tra' => now()->subDay(7),
                 'id_sach' => $request->id_sach,
-                'id_nguoi_dung' => $request->id_nguoi_dung,
+                'ngay_muon' => now(),
+                'id_nguoi_dung' => 1,
                 'so_luong_sach' => 1 //ở giao diện truyền thêm trường so_luong_sach ve Be nữa à oke
             ]);
 
@@ -169,7 +139,7 @@ class PhieuMuonController extends Controller
             'ngay_muon' => $request->ngay_muon,
             'ngay_tra' => $request->ngay_tra,
             'id_sach' => $request->id_sach,
-            'id_nguoi_dung' => $request->id_nguoi_dung,
+            'id_nguoi_dung' => $request->user()->id,
         ]);
 
         return response()->json([

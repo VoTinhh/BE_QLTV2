@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('hinh_anh');
             $table->decimal('gia_tien', 10, 2);
             $table->text('mo_ta');
+            $table->unsignedBigInteger('id_tac_gia')->nullable(); // Khóa ngoại cho tác giả
+            $table->unsignedBigInteger('id_nha_xuat_ban')->nullable(); // Khóa ngoại cho nhà xuất bản
+            $table->unsignedBigInteger('id_vi_tri')->nullable(); // Khóa ngoại cho vị trí
             $table->timestamps();
         });
     }

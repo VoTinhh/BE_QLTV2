@@ -20,5 +20,6 @@ class NguoiDung extends Authenticatable
         'so_dien_thoai',
         'dia_chi',
         'password',
+        'isAdmin'
     ];
 }

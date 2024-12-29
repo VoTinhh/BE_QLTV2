@@ -13,6 +13,8 @@ class NhanVien extends Model
 
     protected $table = 'nhan_viens';
 
+    protected $primaryKey ='id_nhan_vien';
+
     protected $fillable = [
         'id_nhan_vien',
         'ten_nhan_vien',

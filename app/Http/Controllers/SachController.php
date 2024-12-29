@@ -18,6 +18,23 @@ class SachController extends Controller
         ], 200);
     }
 
+    public function show($id)
+    {
+        $sach = Sach::with(['tacGia', 'nhaXuatBan', 'viTri'])->find($id);
+
+        if (!$sach) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Sách không tồn tại',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'data' => $sach,
+        ], 200);
+    }
+
     // Thêm mới sách
     public function store(SachRequest $request)
     {

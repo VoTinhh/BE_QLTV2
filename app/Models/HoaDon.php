@@ -20,9 +20,9 @@ class HoaDon extends Model
     {
         return $this->belongsTo(ThanhToan::class, 'id_thanh_toan');
     }
-    public function phieuMuon()
-{
-    return $this->belongsTo(PhieuMuon::class, 'id_phieu_muon');
-}
 
+    public function phieuMuon()
+    {
+        return $this->belongsTo(PhieuMuon::class, 'id_phieu_muon');
+    }
 }

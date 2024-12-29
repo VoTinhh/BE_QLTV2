@@ -44,7 +44,7 @@ class NguoiDungController extends Controller
         }
     }
 
-    public function update(NguoiDungUpdateRequest $request)
+    public function update(Request $request)
     {
         try {
             $nguoiDung = NguoiDung::findOrFail($request->user()->id);

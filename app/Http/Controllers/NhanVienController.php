@@ -79,7 +79,9 @@ class NhanVienController extends Controller
     public function delete(NhanVienDeleteRequest $request, $id)
     {
         $nhanVien = NhanVien::findOrFail($id);
+
         $nhanVien->delete();
+
         return response()->json([
             'status'  => 1,
             'message' => 'Xóa người dùng thành công.',

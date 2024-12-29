@@ -10,25 +10,57 @@ use Illuminate\Support\Facades\Log;
 
 class HoaDonController extends Controller
 {
-    public function getData()
+    public function getData(Request $request)
     {
-        // Lấy danh sách hóa đơn kèm thông tin từ các bảng liên quan
-        $hoaDons = HoaDon::with([
-            'phieuMuon' => function ($query) {
-                $query->select('id', 'ngay_muon', 'ngay_tra', 'id_sach', 'id_nguoi_dung');
-            },
-            'phieuMuon.sach' => function ($query) {
-                $query->select('id_sach', 'ten_sach', 'so_luong');
-            },
-            'phieuMuon.nguoiDung' => function ($query) {
-                $query->select('id_nguoi_dung', 'ten_nguoi_dung');
-            }
-        ])->get();
+        try {
+            $hoaDons = HoaDon::with([
+                'phieuMuon' => function ($query) {
+                    $query->select('id', 'ngay_muon', 'ngay_tra', 'id_sach', 'id_nguoi_dung');
+                },
+                'phieuMuon.sach' => function ($query) {
+                    $query->select('id_sach', 'ten_sach', 'so_luong', 'gia_tien');
+                },
+                'phieuMuon.nguoiDung' => function ($query) {
+                    $query->select('id', 'ten_nguoi_dung');
+                }
+            ])->where('id_nguoi_dung', $request->user()->id)->get();
 
-        // Trả về dữ liệu dạng JSON
-        return response()->json([
-            'hoa_dons' => $hoaDons,
-        ]);
+            // Trả về dữ liệu dạng JSON
+            return response()->json([
+                'hoa_dons' => $hoaDons,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            return response()->json([
+                'lỗi' => $request->user(),
+            ]);
+        }
+    }
+    public function getAll(Request $request)
+    {
+        try {
+            $hoaDons = HoaDon::with([
+                'phieuMuon' => function ($query) {
+                    $query->select('id', 'ngay_muon', 'ngay_tra', 'id_sach', 'id_nguoi_dung');
+                },
+                'phieuMuon.sach' => function ($query) {
+                    $query->select('id_sach', 'ten_sach', 'so_luong', 'gia_tien');
+                },
+                'phieuMuon.nguoiDung' => function ($query) {
+                    $query->select('id', 'ten_nguoi_dung');
+                }
+            ])->get();
+
+            // Trả về dữ liệu dạng JSON
+            return response()->json([
+                'hoa_dons' => $hoaDons,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            return response()->json([
+                'lỗi' => $request->user(),
+            ]);
+        }
     }
     public function create(Request $request)
     {
@@ -41,7 +73,7 @@ class HoaDonController extends Controller
                     'message' => 'Không tìm thấy phiếu mượn.',
                 ], 404);
             }
-    
+
             // Tạo mới hóa đơn
             $hoaDon = HoaDon::create([
                 'trang_thai' => $request->trang_thai,
@@ -50,7 +82,7 @@ class HoaDonController extends Controller
                 'id_nguoi_dung' => $phieuMuon->id_nguoi_dung, // Lấy người dùng từ phiếu mượn
                 'id_phieu_muon' => $request->id_phieu_muon,
             ]);
-    
+
             return response()->json([
                 'status' => true,
                 'message' => 'Tạo mới hóa đơn thành công!',
@@ -65,7 +97,7 @@ class HoaDonController extends Controller
             ], 500);
         }
     }
-    
+
     public function update(Request $request, $id)
     {
         try {

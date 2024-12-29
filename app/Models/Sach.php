@@ -27,10 +27,28 @@ class Sach extends Model
         'hinh_anh',
         'gia_tien',
         'mo_ta',
+        'id_tac_gia',
+        'id_nha_xuat_ban',
+        'id_vi_tri',
     ];
 
     public function phieuMuon()
     {
         return $this->hasMany(PhieuMuon::class, 'id_sach');
+    }
+
+    public function tacGia()
+    {
+        return $this->belongsTo(TacGia::class, 'id_tac_gia');
+    }
+
+    public function nhaXuatBan()
+    {
+        return $this->belongsTo(NhaXuatBan::class, 'id_nha_xuat_ban');
+    }
+
+    public function viTri()
+    {
+        return $this->belongsTo(ViTri::class, 'id_vi_tri');
     }
 }
